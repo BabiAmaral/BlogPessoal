@@ -1,5 +1,6 @@
 package org.generation.blogPessoal.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -28,8 +29,8 @@ public class Tema
 	
 	@OneToMany (mappedBy = "tema", cascade = CascadeType.ALL) //mappedBy= o atributo que estamos mapeando
 	                                                          //cascade = se deletamos um tema todas as postagens teram um efeito
-	@JsonIgnoreProperties("tema") //ignorar o tema?
-	private List<Postagem> postagem;
+	@JsonIgnoreProperties({"tema"}) //ignorar o tema?
+	private List<Postagem> listaDePostagens= new ArrayList<>();
 
 	public long getId()
 	{
@@ -51,15 +52,15 @@ public class Tema
 		this.descricao = descricao;
 	}
 
-	public List<Postagem> getPostagem()
+	public List<Postagem> getListaDePostagens()
 	{
-		return postagem;
+		return listaDePostagens;
 	}
 
-	public void setPostagem(List<Postagem> postagem)
+	public void setListaDePostagens(List<Postagem> listaDePostagens)
 	{
-		this.postagem = postagem;
+		this.listaDePostagens = listaDePostagens;
 	}
-	
+
 
 }

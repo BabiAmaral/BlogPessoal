@@ -1,12 +1,19 @@
 package org.generation.blogPessoal.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name="tb_usuario")
@@ -14,26 +21,31 @@ public class Usuario
 {
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	private long id;
+	private Long id;
 	
-	@NotNull
-	@Size(min=2, max=100)
+	@NotBlank(message = "Necessario Nome")
+	@Size(min=5, max=200)
 	private String nome;
 	
-	@NotNull
+	@NotBlank(message="Necessario nome de usuario")
 	@Size(min=5, max=100)
 	private String usuario;
 	
-	@NotNull
-	@Size(min=5, max=100)
+	@NotBlank
+	@Size(min=5, max=100, message= "Necessario min 5 caracteres")
 	private String senha;
+	
+	@OneToMany(mappedBy = "criador", cascade = CascadeType.REMOVE)
+	@JsonIgnoreProperties({"criador"})
+	private List<Postagem> minhasPostagens = new ArrayList<>();
 
-	public long getId()
+
+	public Long getId()
 	{
 		return id;
 	}
 
-	public void setId(long id)
+	public void setId(Long id)
 	{
 		this.id = id;
 	}
@@ -67,6 +79,17 @@ public class Usuario
 	{
 		this.senha = senha;
 	}
+
+	public List<Postagem> getMinhasPostagens()
+	{
+		return minhasPostagens;
+	}
+
+	public void setMinhasPostagens(List<Postagem> minhasPostagens)
+	{
+		this.minhasPostagens = minhasPostagens;
+	}
+	
 	
 	
 }

@@ -1,9 +1,13 @@
 package org.generation.blogPessoal.controller;
 
 import java.util.List;
+import java.util.Optional;
+
+import javax.validation.Valid;
 
 import org.generation.blogPessoal.model.Tema;
 import org.generation.blogPessoal.repository.TemaRepository;
+import org.generation.blogPessoal.service.TemaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,37 +28,64 @@ public class TemaController
 {
 	@Autowired
 	private TemaRepository repository;
-	
-	@GetMapping
-	public ResponseEntity <List<Tema>> getAll (){
-		return ResponseEntity.ok(repository.findAll());
+	@Autowired
+	private TemaService service;
+
+	@GetMapping("/todos")
+	public ResponseEntity<Object> getAll() {
+		List<Tema> listaTema = repository.findAll();
+
+		if (listaTema.isEmpty()) {
+			return ResponseEntity.status(204).build();
+		} else {
+			return ResponseEntity.status(200).body(listaTema);
+		}
+
 	}
 	
 	@GetMapping ("/{id}")
-	public ResponseEntity <Tema> getById (@PathVariable long id){
-		return repository.findById(id).map(resp -> ResponseEntity.ok(resp))
-				.orElse(ResponseEntity.notFound().build());
+	public ResponseEntity<Tema> getById(@PathVariable(value = "id") long id) {
+		Optional<Tema> objetoTema = repository.findById(id);
+		if (objetoTema.isPresent()) {
+			return ResponseEntity.status(200).body(objetoTema.get());
+		} else {
+			return ResponseEntity.status(204).build();
+		}
 	}
 	
-	@GetMapping ("/nome/{nome}")
-	public ResponseEntity<List<Tema>> getByName(@PathVariable String nome){
-		return ResponseEntity.ok(repository.findAllByDescricaoContainingIgnoreCase(nome)); //método criado para buscar por uma parte do nome, semalhante ao like do mysql
+
+	@GetMapping ("/descricao/{descricao}")
+	public ResponseEntity<List<Tema>> getByName(@PathVariable String descricao){
+		return ResponseEntity.ok(repository.findAllByDescricaoContainingIgnoreCase(descricao)); //método criado para buscar por uma parte do nome, semalhante ao like do mysql
 	}
 	
-	@PostMapping
-	public ResponseEntity<Tema> post (@RequestBody Tema tema){  //usa-se o requestBody, pois Tema é uma entidade
+	@PostMapping("/salvar")
+	public ResponseEntity<Object> post (@Valid @RequestBody Tema novoTema){  //usa-se o requestBody, pois Tema é uma entidade
 	
-		return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(tema));
+		return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(novoTema));
 	}
 	
-	@PutMapping
-	public ResponseEntity<Tema> put (@RequestBody Tema tema){  
-		return ResponseEntity.ok(repository.save(tema));
+	@PutMapping("/alterar")
+	public ResponseEntity<Object> alterar(@Valid @RequestBody Tema temaParaAlterar) {
+		Optional<Tema> objetoAlterado = service.alterarTema(temaParaAlterar);
+
+		if (objetoAlterado.isPresent()) {
+			return ResponseEntity.status(201).body(objetoAlterado.get());
+		} else {
+			return ResponseEntity.status(400).build();
+		}
 	}
-	
-	@DeleteMapping("/{id}")
-	public void delete(@PathVariable long id) {
-		repository.deleteById(id);
+
+	@DeleteMapping("/deletar/{id}")
+	public ResponseEntity<Object> deletarPorId(@PathVariable(value = "id") long id) {
+		Optional<Tema> objetoExistente = repository.findById(id);
+		if (objetoExistente.isPresent()) {
+			repository.deleteById(id);
+			return ResponseEntity.status(200).build();
+		} else {
+			return ResponseEntity.status(400).build();
+		}
+
 	}
 
 }

@@ -1,11 +1,14 @@
 package org.generation.blogPessoal.controller;
 
 import java.util.List;
+import java.util.Optional;
+
+import javax.validation.Valid;
 
 import org.generation.blogPessoal.model.Postagem;
 import org.generation.blogPessoal.repository.PostagemRepository;
+import org.generation.blogPessoal.service.PostagemService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,12 +29,32 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostagemController
 {
 	@Autowired //garante que todos serviços da interface repository seja acessado a partir do  controller
-
 	private PostagemRepository repository;
+	@Autowired
+	private PostagemService service;
 	
-	@GetMapping //("/todas")
-	public ResponseEntity<List<Postagem>> GetAll(){
-		return ResponseEntity.ok(repository.findAll());//FindById
+	@PostMapping("/salvar")
+	public ResponseEntity<Object> cadastrarPostagem(@Valid @RequestBody Postagem novaPostagem) {
+		Optional<?> objetoCadastrado = service.cadastrarPostagem(novaPostagem);
+
+		if (objetoCadastrado.isPresent()) {
+			return ResponseEntity.status(201).body(objetoCadastrado.get());
+		} else {
+			return ResponseEntity.status(400).build();
+		}
+
+	}
+
+	@GetMapping ("/todas")
+	public ResponseEntity<Object> buscarTodas() {
+		List<Postagem> listaPostagem = repository.findAll();
+
+		if (listaPostagem.isEmpty()) {
+			return ResponseEntity.status(204).build();
+		} else {
+			return ResponseEntity.status(200).body(listaPostagem);
+		}
+
 	}
 	
 	@GetMapping("/{id}")
@@ -54,20 +77,40 @@ public class PostagemController
 		
 		return ResponseEntity.ok(repository.findAllByTituloContainingIgnoreCase(titulo));
 	}
-	
+/*
 	@PostMapping //insersão  //no postman não passa o id
 	public ResponseEntity<Postagem> post (@RequestBody Postagem postagem){ //como é algo grande, notação pata pegar o corpo
 		return ResponseEntity.status(HttpStatus.CREATED).body(repository.save(postagem));
-	
 	}
+*/
+	@PutMapping("/alterar")
+	public ResponseEntity<Object> alterar(@Valid @RequestBody Postagem postagemParaAlterar) {
+		Optional<Postagem> objetoAlterado = service.alterarPostagem(postagemParaAlterar);
+
+		if (objetoAlterado.isPresent()) {
+			return ResponseEntity.status(201).body(objetoAlterado.get());
+		} else {
+			return ResponseEntity.status(400).build();
+		}
+	}
+	/*
 	@PutMapping  //atualização //no postman passa o id e faz a atualização
 	public ResponseEntity<Postagem> put (@RequestBody Postagem postagem){ //como é algo grande, notação pata pegar o corpo
 		return ResponseEntity.status(HttpStatus.OK).body(repository.save(postagem)); //devolvendo o objeto salvo	
 	}
-	@DeleteMapping ("/{id}")
-	public void delete(@PathVariable long id) {
-		repository.deleteById(id);
+	*/
+	@DeleteMapping ("/deletar/{id}")
+	public ResponseEntity<Object> deletarPorId(@PathVariable(value = "id") long id) {
+		Optional<Postagem> objetoExistente = repository.findById(id);
+		if (objetoExistente.isPresent()) {
+			repository.deleteById(id);
+			return ResponseEntity.status(200).build();
+		} else {
+			return ResponseEntity.status(400).build();
+		}
+		
 	}
+	
 }        
 
 

@@ -3,6 +3,7 @@ package org.generation.blogPessoal.model;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -13,6 +14,7 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 /*Anotações são parametros que colocamos em cima das propriedades(ou classe) 
   para que dê um certo tipo de comportamento para elas.*/
@@ -33,12 +35,16 @@ public class Postagem
 	@Size(min = 10, max = 500)
 	private String texto;
 
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date date = new java.sql.Date(System.currentTimeMillis());// para data, importar do java util e usamos o
+	private Date data = new java.sql.Date(System.currentTimeMillis());// para data, importar do java util e usamos o
 								                                      // metodo para ele capturar cada data.
-	
-	@ManyToOne //anotações para que as entidades postagem e tema se relacionem //relação muitos para 1
-	@JsonIgnoreProperties("postagem") //o que vamos ignorar dentro de tema, ou melhor, quando chegar em () para de aprensentar dentro de tema
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JsonIgnoreProperties({ "minhasPostagens" })
+	private Usuario criador;
+
+	@ManyToOne(fetch = FetchType.EAGER) //anotações para que as entidades postagem e tema se relacionem //relação muitos para 1
+	@JsonIgnoreProperties({"listaDePostagens"}) //o que vamos ignorar dentro de tema, ou melhor, quando chegar em () para de aprensentar dentro de tema
 	private Tema tema;
 
 	public long getId()
@@ -71,14 +77,24 @@ public class Postagem
 		this.texto = texto;
 	}
 
-	public Date getDate()
+	public Date getData()
 	{
-		return date;
+		return data;
 	}
 
-	public void setDate(Date date)
+	public void setData(Date data)
 	{
-		this.date = date;
+		this.data = data;
+	}
+
+	public Usuario getCriador()
+	{
+		return criador;
+	}
+
+	public void setCriador(Usuario criador)
+	{
+		this.criador = criador;
 	}
 
 	public Tema getTema()
@@ -91,4 +107,5 @@ public class Postagem
 		this.tema = tema;
 	}
 
+	
 }
