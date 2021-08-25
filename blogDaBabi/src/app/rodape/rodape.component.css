@@ -23,3 +23,9 @@ ul.social-network li{
   .fa-linkedin-square:hover{
     color: #0072b1;
   }
+  .cor-rodape{
+    background-color: #c77dff;
+}
+.cor-footer{
+  background-color: #10002b;
+}
