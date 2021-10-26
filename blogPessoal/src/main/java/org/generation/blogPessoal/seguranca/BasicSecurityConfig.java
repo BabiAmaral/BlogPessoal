@@ -34,11 +34,13 @@ public class BasicSecurityConfig extends WebSecurityConfigurerAdapter
 	protected void configure (HttpSecurity http) throws Exception {
 		http.authorizeRequests()
 		//.antMatchers("/**").permitAll()
-		.antMatchers(HttpMethod.POST,"/usuario/logar").permitAll() //serve para liberar end-points, caminhos do controler, para o cliente ter acesso sem precisar passar pelo token
-		.antMatchers(HttpMethod.POST,"/usuario/cadastrar").permitAll()
+		.antMatchers("/usuarios/logar").permitAll() //serve para liberar end-points, caminhos do controler, para o cliente ter acesso sem precisar passar pelo token
+		.antMatchers("/usuarios/cadastrar").permitAll()
+		.antMatchers(HttpMethod.OPTIONS).permitAll()
 		.anyRequest().authenticated()//todos os demais deveram ser autenticados
 		.and().httpBasic()
-		.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)//um API rest não guarda sessão. o que é o stateless
+		.and().sessionManagement()
+		.sessionCreationPolicy(SessionCreationPolicy.STATELESS)//um API rest não guarda sessão. o que é o stateless
 		.and().cors()//habilitar o cors, mais de uma rota fazendo requisições no servidor
 		.and().csrf().disable();//desabilitar o csrf, utilizará as configurações padrões.
 		

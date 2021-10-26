@@ -13,13 +13,13 @@ public class UserDetailsImpl implements UserDetails //Fornece informações bás
 	
 	//atributos
 	private String userName;
-	private String senha;
+	private String password;
 	private List<GrantedAuthority> authorities;
 	
 	//construtor
 	public UserDetailsImpl(Usuario user) { //populando
 		this.userName = user.getUsuario();
-		this.senha = user.getSenha();		
+		this.password = user.getSenha();		
 	}
 	//construtor vazio
 	public UserDetailsImpl() {}
@@ -37,7 +37,7 @@ public class UserDetailsImpl implements UserDetails //Fornece informações bás
 	public String getPassword()
 	{
 		// TODO Auto-generated method stub
-		return senha;
+		return password;
 	}
 
 	@Override
